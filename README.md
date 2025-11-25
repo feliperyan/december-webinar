@@ -34,6 +34,10 @@ The UI needs to be responsive and modern to cater for all devices. Research show
 
 At the moment we'll present a simple list of all available pets as links, each link will open a page with the pet's details and a single button to apply to adopt the pet. This will change the status of the pet to "adopted" in the Database.
 
+Our graphic design team added a great mockup of the UI, we'll use it as a reference.
+
+![Mockup](mockup.png)
+
 # Technical information
 ## Pet data schema
 We decided that the best schema for the data is a JSON object with the properties 

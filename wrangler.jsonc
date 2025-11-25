@@ -14,7 +14,10 @@
 		"run_worker_first": ["/doc", "/api/*"]
 	},
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"traces": {
+			"enabled": true
+		}
 	},
 	"d1_databases": [
 		{
