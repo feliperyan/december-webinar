@@ -206,6 +206,9 @@ app.openapi(createPetRoute, async (c) => {
   const petData = c.req.valid('json')
   const db = c.env.DB
 
+  const prompt = `A friendly ${petData.species} ${petData.primaryBreed}, ${petData.ageInMonths} months old, ${petData.gender}, ${petData.size}, ${petData.color}, ${petData.appearance}`;
+  const imageURL = await createAndUploadImage(prompt, c.env);
+
   // Generate ID if not provided
   const petId = petData.id || `pet-${Date.now()}`
 
@@ -240,7 +243,8 @@ app.openapi(createPetRoute, async (c) => {
         petData.dateArrived,
         petData.adoptionStatus,
         petData.location,
-        petData.image
+        // petData.image
+        imageURL
       )
       .run()
 
@@ -276,5 +280,38 @@ app.doc('/doc', {
 app.notFound((c) => {
   return c.body(null, 404)
 })
+
+const createAndUploadImage = async(description: string, env: Env): Promise<string> => {
+    const API_URL = "https://api.cloudflare.com/client/v4/accounts/<YOUR ACCOUNT ID>/images/v1";
+    const TOKEN = env.CF_IMAGES_TOKEN;
+
+    const stream = await env.AI.run(
+        "@cf/bytedance/stable-diffusion-xl-lightning",
+        {
+            prompt: description
+        }
+    );
+    const bytes = await (new Response(stream)).bytes();
+
+    const formData = new FormData();
+    formData.append('file', new File([bytes], 'image.jpg'));
+
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+        },
+        body: formData,
+    });
+    const resp = await response.json() as any;
+
+    console.log(`AI response: ${JSON.stringify(resp)}`);
+
+    if (resp['success'] === false) {
+        throw new Error('Failed to create image');
+    }
+
+    return resp['result']['variants'][0];
+}
 
 export default app

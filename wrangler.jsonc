@@ -22,7 +22,10 @@
 			"database_name": "pets-01",
 			"database_id": "1f866bdb..."
 		}
-	],	
+	],
+	"ai": {
+		"binding": "AI"
+	},		
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
