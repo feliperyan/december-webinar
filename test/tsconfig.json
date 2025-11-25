@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2021"],
+    "types": [
+      "@cloudflare/vitest-pool-workers", // provides `cloudflare:test` types
+    ],
+  },
+  "include": [
+    "./**/*.ts",
+    "../worker-configuration.d.ts", // output of `wrangler types`
+  ],
+}
