@@ -153,7 +153,17 @@ Place the schemas in a new file `worker/schemas.ts`.
 
 ### 2.2 Get Cloudflare Configuration Information
 
-Ask the LLM to explain the `assets` settings in your `wrangler.jsonc` config, leveraging the documentation tool:
+First, add some config to `wrangler.jsonc` once again, this is so that we can properly serve our static assets and API routes.
+
+```jsonc
+"assets": {
+		"not_found_handling": "single-page-application",
+		"directory": "./public",
+		"run_worker_first": ["/doc", "/api/*"]
+	},
+```
+
+If you want to better understand what we just configured, you can ask the LLM to explain the `assets` settings in your `wrangler.jsonc` config, leveraging the Cloudflare documentation MCP Server:
 
 🤖 Prompt:
 
