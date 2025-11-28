@@ -1,22 +1,19 @@
 ## 🛠️ Step 0: Set Up Cloudflare Project
 
-### 0.1 Create a Cloudflare Workers Project
+### Introduction
 
-1.  Create a new Cloudflare Workers project using:
+Hello there 👋 , you probably just cloned this repository to follow along with the Webinar, thank you for joining us!
 
-    ```bash
-    npm create cloudflare@latest
-    ```
 
-    Select **Framework Starter** $\rightarrow$ **React** $\rightarrow$ **TypeScript + SWC**.
+### 0.1 Adding some config
 
-2.  Edit your `wrangler.jsonc` file and include your **Account ID**:
+1.  Edit your `wrangler.jsonc` file and include your Cloudflare **Account ID**:
 
     ```jsonc
     "account_id": "14c3ac...",
     ```
 
-3.  Create a `.env` file and enter your API token with the **`Cloudflare Images` scope**:
+2.  Create a `.env` file and enter your API token with the **`Cloudflare Images` scope**:
 
     ```bash
     CF_IMAGES_TOKEN=your_token_here
@@ -27,11 +24,91 @@
 Install the necessary dependencies for building the API and running tests:
 
 ```bash
-npm i hono
-npm i zod
-npm i @hono/zod-openapi
-npm i -D vitest@~3.2.0 @cloudflare/vitest-pool-workers
+npm install
 ```
+
+### 0.3 Configure MCP Servers
+
+#### VSCode
+  1. Create a `.vscode` folder and add a `mcp.json` file
+  2. Copy and paste the below:
+
+```json
+{
+    "servers": {       
+        "cloudflare-documentation": {
+            "type": "http",
+            "url": "https://docs.mcp.cloudflare.com/mcp"
+        },
+        "cloudflare-bindings": {
+            "type": "http",
+            "url": "https://bindings.mcp.cloudflare.com/mcp",
+            "headers": {"Authorization": "Bearer <YOUR TOKEN>"}
+        },
+        "cloudflare-observability": {
+            "type": "http",
+            "url": "https://observability.mcp.cloudflare.com/mcp",
+            "headers": {"Authorization": "Bearer <YOUR TOKEN>"}
+        },
+    }
+}
+ ```
+
+more info
+
+#### Windsurf
+1. Bring up the MCP Marketplace (on a Mac you can use `Shift + Cmd + P` and type `MCP: Open MCP Marketplace`)
+2. Click the small ⚙️ icon next to the MCP Marketplace tab
+3. Click `Add MCP Server`
+4. Copy and paste the below:
+
+```json
+{
+  "mcpServers": {
+    "cloudflare-documentation": {
+      "serverUrl": "https://docs.mcp.cloudflare.com/mcp"      
+    },
+    "cloudflare-workers-bindings": {
+      "serverUrl": "https://bindings.mcp.cloudflare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <YOUR TOKEN>",
+        "Content-Type": "application/json"
+      }
+    },
+    "cloudflare-observability": {
+      "serverUrl": "https://observability.mcp.cloudflare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <YOUR TOKEN>",
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}
+```
+[More info link](https://windsurf.com/university/tutorials/configuring-first-mcp-server)
+
+#### Cursor
+1. Create a `.cursor` folder and a `mcp.json` file
+2. Copy and paste the below:
+
+```json
+{
+    "mcpServers": {       
+        "cloudflare-documentation": {            
+            "url": "https://docs.mcp.cloudflare.com/mcp"
+        },
+        "cloudflare-bindings": {            
+            "url": "https://bindings.mcp.cloudflare.com/mcp",
+            "headers": {"Authorization": "Bearer <YOUR TOKEN>"}
+        },
+        "cloudflare-observability": {            
+            "url": "https://observability.mcp.cloudflare.com/mcp",
+            "headers": {"Authorization": "Bearer <YOUR TOKEN>"}
+        },
+    }
+}
+```
+[More info link](https://cursor.com/docs/context/mcp#authentication)
 
 -----
 
