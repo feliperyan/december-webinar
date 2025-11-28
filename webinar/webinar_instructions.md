@@ -204,7 +204,7 @@ It should look something like this:
 "d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "pets-001",
+			"database_name": "pets-01",
 			"database_id": "e738f4d3-..."
 		}
 	]
@@ -229,7 +229,7 @@ Write a SQL file to create the Pets table. It must follow the same schema found 
 If the LLM didn't include example rows, ask it to add a few. Then, execute the following command to create the table and insert the example rows into your **local** D1 database:
 
 ```bash
-npx wrangler d1 execute pets-001 --local --file=./schema.sql
+npx wrangler d1 execute pets-01 --local --file=./schema.sql
 ```
 
 ### 3.4 Apply Schema to Remote Database
@@ -237,7 +237,7 @@ npx wrangler d1 execute pets-001 --local --file=./schema.sql
 To ensure the **remote** database contains the same table structure, execute the command again, noticing the crucial `--remote` flag. You may comment out any dummy data in `schema.sql` if you only want to apply the schema.
 
 ```bash
-npx wrangler d1 execute pets-001 --file=./schema.sql --remote
+npx wrangler d1 execute pets-01 --file=./schema.sql --remote
 ```
 
 -----
