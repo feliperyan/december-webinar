@@ -1,4 +1,7 @@
 ## 🛠️ Step 0: Set Up Cloudflare Project
+<details>
+
+<summary>Expand for details</summary>
 
 ### Introduction
 
@@ -25,6 +28,10 @@ Install the necessary dependencies for building the API and running tests:
 
 ```bash
 npm install
+npm i hono
+npm i zod
+npm i @hono/zod-openapi
+npm i -D vitest@~3.2.0 @cloudflare/vitest-pool-workers
 ```
 
 ### 0.3 Configure MCP Servers
@@ -109,10 +116,14 @@ more info
 }
 ```
 [More info link](https://cursor.com/docs/context/mcp#authentication)
+</details>
 
 -----
 
 ## 🚀 Step 1: Use the Hono Framework
+
+<details>
+<summary>Expand for details</summary>
 
 We will begin by integrating the **Hono framework**. The first task is to refactor the default backend script in `index.ts` to use Hono while maintaining the existing functionality.
 
@@ -126,9 +137,14 @@ I want to use the Hono framework. Refactor this code with the same functionality
 
 Run the application locally with `npm run dev`. You should see the default UI. Verify the Hono refactor by clicking the button; the text "Name from API is: unknown" should update with the API response.
 
+</details>
+
 -----
 
 ## 🗺️ Step 2: First API Endpoint
+
+<details>
+<summary>Expand for details</summary>
 
 ### 2.1 Implement the `/api/pets` Endpoint
 
@@ -172,9 +188,14 @@ Look at @wrangler.jsonc and explain the `assets` settings in the context of the 
 Use the Cloudflare Documentation MCP Server.
 ```
 
+</details>
+
 -----
 
 ## 🗄️ Step 3: Database Integration (Cloudflare D1)
+
+<details>
+<summary>Expand for details</summary>
 
 ### 3.1 Create a D1 Database
 
@@ -240,9 +261,14 @@ To ensure the **remote** database contains the same table structure, execute the
 npx wrangler d1 execute pets-01 --file=./schema.sql --remote
 ```
 
+</details>
+
 -----
 
 ## 📝 Step 4: Complete the API Endpoints
+
+<details>
+<summary>Expand for details</summary>
 
 ### 4.1 Refactor the `GET /api/pets` Endpoint
 
@@ -267,9 +293,14 @@ You MUST follow a similar implementation already in place for api/pets endpoint 
 
 Confirm that you have new Zod schemas, new routes, and new handlers implemented.
 
+</details>
+
 -----
 
 ## 🧪 Step 5: Implement Unit Tests
+
+<details>
+<summary>Expand for details</summary>
 
 ### 5.1 Add Vitest Configuration
 
@@ -317,19 +348,28 @@ Execute your tests with the following command:
 npx vitest run
 ```
 
+</details>
+
 -----
 
 ## 🖼️ Step 6: Integrate AI Image Generation
 
+<details>
+<summary>Expand for details</summary>
+
 ### 6.1 Configure AI and Image Bindings
 
-First, add the Workers AI binding and regenerate the types:
+First, add the Workers AI binding and an environment variable for your account id regenerate the types:
 
 ```jsonc
 "ai": {
 		"binding": "AI"
-	},	
+	},
+"vars":{
+  "ACCOUNT_ID": "14c3ac..."
+}
 ```
+Then run the following command to regenerate the types:
 
 ```bash
 npm run cf-typegen
@@ -449,9 +489,14 @@ const createAndUploadImage = async(description: string, env: Env): Promise<strin
 }
 ```
 
+</details>
+
 -----
 
 ## 🎨 Step 7: Final UI and Tracing
+
+<details>
+<summary>Expand for details</summary>
 
 ### 7.1 Refactor the UI
 
@@ -467,12 +512,19 @@ Before deployment, enable distributed **tracing** by updating `wrangler.jsonc`:
 ]
 ```
 
+</details>
+
 -----
 
 ## 🚀 Step 8: Deploy
+
+<details>
+<summary>Expand for details</summary>
 
 Deploy your completed application to Cloudflare Workers with:
 
 ```bash
 npm run deploy
 ```
+
+</details>
