@@ -334,7 +334,172 @@ Create a folder called `test` in your root project folder with the following fil
   * **`tsconfig.json`**
   * **`unit.spec.ts`** (Contains the initial tests)
 
-*(The content for these files remains the same as in your original instructions.)*
+#### env.d.ts
+
+```ts
+declare module "cloudflare:test" {
+  // ProvidedEnv controls the type of `import("cloudflare:test").env`
+  interface ProvidedEnv extends Env {
+  }
+}
+```
+
+#### setup.ts
+
+```ts
+import { env } from "cloudflare:test";
+import { beforeAll } from "vitest";
+
+beforeAll(async () => {
+    // Create tables
+    await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS pets (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  species TEXT NOT NULL,
+  primaryBreed TEXT NOT NULL,
+  secondaryBreed TEXT,
+  ageInMonths INTEGER NOT NULL,
+  gender TEXT NOT NULL,
+  size TEXT NOT NULL,
+  color TEXT NOT NULL,
+  appearance TEXT NOT NULL,
+  description TEXT NOT NULL,
+  vaccinated INTEGER NOT NULL, -- SQLite uses INTEGER for boolean (0 = false, 1 = true)
+  temperament TEXT NOT NULL, -- Stored as JSON string array
+  adoptionFee INTEGER NOT NULL,
+  dateArrived TEXT NOT NULL, -- Stored as ISO date string
+  adoptionStatus TEXT NOT NULL,
+  location TEXT NOT NULL,
+  image TEXT NOT NULL
+)`).run();
+
+    // Seed dummy data
+    await env.DB.prepare(`INSERT INTO pets (
+  id, name, species, primaryBreed, secondaryBreed, ageInMonths, gender, size, color,
+  appearance, description, vaccinated, temperament, adoptionFee, dateArrived,
+  adoptionStatus, location, image
+) VALUES (
+  'pet-002',
+  'Copper',
+  'dog',
+  'Beagle',
+  NULL,
+  18,
+  'female',
+  'medium',
+  'Tricolor (Brown, Black, White)',
+  'Short, dense, glossy coat; floppy ears; soulful brown eyes.',
+  'Sweet, vocal scent hound. Loves sniffing and following trails. Needs a secure yard and patient training due to wanderlust.',
+  1,
+  '["curious", "vocal", "social", "scent-driven"]',
+  300,
+  '2025-10-01',
+  'available',
+  'Main Shelter - Quiet Wing',
+  'https://example.com/pet-002.jpg'
+)`).run();
+
+    await env.DB.prepare(`INSERT INTO pets (
+  id, name, species, primaryBreed, secondaryBreed, ageInMonths, gender, size, color,
+  appearance, description, vaccinated, temperament, adoptionFee, dateArrived,
+  adoptionStatus, location, image
+) VALUES (
+  'pet-003',
+  'Sky',
+  'bird',
+  'Cockatiel',
+  'Lutino',
+  24,
+  'male',
+  'small',
+  'Yellow and Orange',
+  'Bright yellow feathers, orange cheek patches, crest, and a long tail.',
+  'Very sweet and tame. Loves to sit on shoulders and whistle. Requires daily social interaction and time outside the cage.',
+  1,
+  '["social", "calm", "whistles", "needs routine"]',
+  150,
+  '2025-09-05',
+  'available',
+  'Foster Home - Bird Room',
+  'https://example.com/pet-002.jpg'
+)`).run();
+
+});
+
+```
+
+
+#### tsconfig.json
+
+```json
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2021"],
+    "types": [
+      "@cloudflare/vitest-pool-workers", // provides `cloudflare:test` types
+    ],
+  },
+  "include": [
+    "./**/*.ts",
+    "../worker-configuration.d.ts", // output of `wrangler types`
+  ],
+}
+```
+
+#### unit.spec.ts
+
+```ts
+import {
+    env,
+    createExecutionContext,
+    waitOnExecutionContext,
+} from "cloudflare:test";
+import { describe, it, expect } from "vitest";
+
+// Import your worker so you can unit test it
+import index from "../worker/index";
+
+const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
+
+describe("Test API Endpoints", () => {
+
+    it("Get /api/pets", async () => {
+        const request = new IncomingRequest("http://example.com/api/pets");
+
+        // Create an empty context to pass to `worker.fetch()`
+        const ctx = createExecutionContext();
+        const response = await index.fetch(request, env, ctx);
+
+        // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
+        await waitOnExecutionContext(ctx);
+
+        const data = await response.json();
+        expect(response.status).toBe(200);
+        expect(data).toHaveLength(2);
+
+    });
+
+    it("Get /api/pets/:id", async () => {
+        const request = new IncomingRequest("http://example.com/api/pets/pet-002");
+
+        // Create an empty context to pass to `worker.fetch()`
+        const ctx = createExecutionContext();
+        const response = await index.fetch(request, env, ctx);
+
+        // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
+        await waitOnExecutionContext(ctx);
+
+        const data = await response.json();
+        expect(response.status).toBe(200);        
+        expect(data['name']).toBe("Copper");
+
+    });
+});
+```
 
 ### 5.3 Generate More Tests
 
@@ -500,16 +665,25 @@ const createAndUploadImage = async(description: string, env: Env): Promise<strin
 
 ### 7.1 Refactor the UI
 
-The `step-7` branch contains a final `Readme.md` with a mockup of the desired UI. You can experiment with providing this image file to the LLM, combined with a prompt, to refactor `App.ts` and `App.css` to match the mockup.
+The `webinar` folder contains a mockup of a UI for the website. You can tell that _design is not my forte_, but it should give you an idea of what we're going for. Use the LLM to refactor `App.ts` and `App.css` to match the mockup.
+
+Think about the workflow: explore, plan, code, commit and give it a go yourself. Don't forget to refer to the mockup file in your prompt!
+
+Here's the mockup by the way:
+
+![mockup](./mockup.png)
 
 ### 7.2 Enable Tracing
 
 Before deployment, enable distributed **tracing** by updating `wrangler.jsonc`:
 
 ```jsonc
-"compatibility_flags": [
-  "tracing"
-]
+"observability": {
+		"enabled": true,
+		"traces": {
+			"enabled": true,
+		}
+	},
 ```
 
 </details>
